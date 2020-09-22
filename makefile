@@ -1,11 +1,14 @@
-compilerExe: ./build/obj/main.o ./build/obj/Automata.o
-	g++ ./build/obj/main.o ./build/obj/Automata.o -o build/bin/decaf-compiler
+compilerExe: ./build/obj/main.o ./build/obj/Automata.o ./build/obj/Regex.o
+	g++ ./build/obj/main.o ./build/obj/Automata.o ./build/obj/Regex.o -o build/bin/decaf-compiler
 
-./build/obj/main.o: ./build/obj/Automata.o
+./build/obj/main.o: ./build/obj/Automata.o ./build/obj/Regex.o
 	g++ -c ./compiler/scanner/main.cpp -o ./build/obj/main.o
 
 ./build/obj/Automata.o:
 	g++ -c ./compiler/scanner/Automata.cpp -o ./build/obj/Automata.o
+
+./build/obj/Regex.o:
+	g++ -c ./compiler/scanner/Regex.cpp -o ./build/obj/Regex.o
 
 # suffix list
 # .SUFFIXES:
