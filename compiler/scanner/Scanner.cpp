@@ -6,9 +6,155 @@
 #include <unistd.h>
 #include<iostream>
 
+using namespace std; 
 
 
-char* re2post(char *re){
+class State
+{
+private:
+    
+public:
+    int c;
+	State *out;
+	State *out1;
+	int lastlist;
+    State(int c, State *out, State *out1);
+    State(int c);
+};
+
+State::State(int c, State *out, State *out1)
+{
+    this->c = c;
+    this->out = out;
+    this->out1 = out1;
+    this->lastlist = 0;
+}
+
+State::State(int c)
+{
+    this->c = c;
+}
+
+union Ptrlist
+{
+	Ptrlist *next;
+	State *s;
+};
+
+Ptrlist* list1(State **outp)
+{
+	Ptrlist *l;
+	
+	l = (Ptrlist*)outp;
+	l->next = NULL;
+	return l;
+}
+
+Ptrlist* append(Ptrlist *l1, Ptrlist *l2)
+{
+	Ptrlist *oldl1;
+	
+	oldl1 = l1;
+	while(l1->next)
+		l1 = l1->next;
+	l1->next = l2;
+	return oldl1;
+}
+
+/* Patch the list of states at out to point to start. */
+void patch(Ptrlist *l, State *s)
+{
+	Ptrlist *next;
+	
+	for(; l; l=next){
+		next = l->next;
+		l->s = s;
+	}
+}
+
+
+
+class Fragment
+{
+private:
+    
+public:
+    State *start;
+	Ptrlist *out;
+    Fragment(State *start, Ptrlist *out);
+    Fragment() = default;
+};
+
+Fragment::Fragment(State *start, Ptrlist *out)
+{
+    this->start = start;
+    this->out = out;
+}
+
+
+// typedef struct Frag Frag;
+
+// struct Fragment
+// {
+// 	State *start;
+// 	Ptrlist *out;
+// };
+
+// /* Initialize Frag struct. */
+// Fragment
+// Frag(State *start, Ptrlist *out)
+// {
+// 	Frag n = { start, out };
+// 	return n;
+// }
+
+
+enum MatchSplit
+{
+	Match = 257,
+	Split = 256
+};
+// State matchstate =  State(Match);
+// int nstate;
+// List l1, l2;
+// static int listid;
+
+class List
+{
+private:
+    /* data */
+public:
+    State **s;
+	int n;
+};
+
+class regx
+{
+private:
+    State matchstate=  State(Match);;
+    List l1, l2;
+    int listid = 0;
+    int nstate;
+public:
+    char* re2post(char *re);
+    State* post2nfa(char postfix[]);
+    void addstate(List*, State*);
+    void step(List*, int, List*);
+    List* startlist(State *start, List *l);
+    int ismatch(List *l);
+    int match(State *start, char *s);
+    bool eval(char *regex,char *string2match);
+    State* newState(int c, State *out, State *out1);
+
+};
+
+State* regx::newState(int c, State *out, State *out1){
+    State* s = new State(c,out,out1);
+    nstate++;
+    return s;
+}
+
+char* regx::re2post(char *re){
 	int nalt, natom;
 	static char buf[8000];
 	char *dst;
@@ -88,122 +234,7 @@ char* re2post(char *re){
 
 
 
-using namespace std; 
-
-int nstate;
-
-class State
-{
-private:
-    
-public:
-    int c;
-	State *out;
-	State *out1;
-	int lastlist;
-    State(int c, State *out, State *out1);
-    State(int c);
-};
-
-State::State(int c, State *out, State *out1)
-{
-    nstate++;
-    this->c = c;
-    this->out = out;
-    this->out1 = out1;
-    this->lastlist = 0;
-}
-
-State::State(int c)
-{
-    this->c = c;
-}
-
-
-
-union Ptrlist
-{
-	Ptrlist *next;
-	State *s;
-};
-
-Ptrlist* list1(State **outp)
-{
-	Ptrlist *l;
-	
-	l = (Ptrlist*)outp;
-	l->next = NULL;
-	return l;
-}
-
-Ptrlist* append(Ptrlist *l1, Ptrlist *l2)
-{
-	Ptrlist *oldl1;
-	
-	oldl1 = l1;
-	while(l1->next)
-		l1 = l1->next;
-	l1->next = l2;
-	return oldl1;
-}
-
-/* Patch the list of states at out to point to start. */
-void patch(Ptrlist *l, State *s)
-{
-	Ptrlist *next;
-	
-	for(; l; l=next){
-		next = l->next;
-		l->s = s;
-	}
-}
-
-
-
-class Fragment
-{
-private:
-    
-public:
-    State *start;
-	Ptrlist *out;
-    Fragment(State *start, Ptrlist *out);
-    Fragment() = default;
-};
-
-Fragment::Fragment(State *start, Ptrlist *out)
-{
-    this->start = start;
-    this->out = out;
-}
-
-
-// typedef struct Frag Frag;
-
-// struct Fragment
-// {
-// 	State *start;
-// 	Ptrlist *out;
-// };
-
-// /* Initialize Frag struct. */
-// Fragment
-// Frag(State *start, Ptrlist *out)
-// {
-// 	Frag n = { start, out };
-// 	return n;
-// }
-
-
-enum
-{
-	Match = 257,
-	Split = 256
-};
-State matchstate =  State(Match);
-
-
-State* post2nfa(char postfix[])
+State* regx::post2nfa(char postfix[])
 {
 	char *p;
 	Fragment e1, e2, e;
@@ -217,7 +248,7 @@ State* post2nfa(char postfix[])
 	for(p=postfix; *p; p++){
 		switch(*p){
 		default:
-			s = new State(*p, NULL, NULL);
+			s = newState(*p, NULL, NULL);
 			my_stack.push(Fragment(s, list1(&s->out)));
 			break;
 		case '.':	/* catenate */
@@ -234,7 +265,7 @@ State* post2nfa(char postfix[])
             my_stack.pop();
 			e1 = my_stack.top();
             my_stack.pop();
-			s = new State(Split, e1.start, e2.start);
+			s = newState(Split, e1.start, e2.start);
 			my_stack.push(Fragment(s, append(e1.out, e2.out)));
             // cout<<"case |"<<"\n";
 
@@ -242,14 +273,14 @@ State* post2nfa(char postfix[])
 		case '?':	/* zero or one */
 			e = my_stack.top();
             my_stack.pop();
-			s = new State(Split, e.start, NULL);
+			s = newState(Split, e.start, NULL);
 			my_stack.push(Fragment(s, append(e.out, list1(&s->out1))));
             // cout<<"case ?"<<"\n";
 			break;
 		case '*':	/* zero or more */
 			e = my_stack.top();
             my_stack.pop();
-			s = new State(Split, e.start, NULL);
+			s = newState(Split, e.start, NULL);
 			patch(e.out, s);
 			my_stack.push(Fragment(s, list1(&s->out1)));
             // cout<<"case *"<<"\n";
@@ -257,7 +288,7 @@ State* post2nfa(char postfix[])
 		case '+':	/* one or more */
 			e = my_stack.top();
             my_stack.pop();
-			s = new State(Split, e.start, NULL);
+			s = newState(Split, e.start, NULL);
 			patch(e.out, s);
 			my_stack.push(Fragment(s, list1(&s->out1)));
             // cout<<"case +"<<"\n";
@@ -285,35 +316,19 @@ State* post2nfa(char postfix[])
 // 	int n;
 // };
 
-class List
-{
-private:
-    /* data */
-public:
-    State **s;
-	int n;
-};
 
-
-List l1, l2;
-static int listid;
-
-void addstate(List*, State*);
-void step(List*, int, List*);
 
 /* Compute initial state list */
-List*
-startlist(State *start, List *l)
+List* regx::startlist(State *start, List *l)
 {
 	l->n = 0;
-	listid++;
+	this->listid++;
 	addstate(l, start);
 	return l;
 }
 
 /* Check whether state list contains a match. */
-int
-ismatch(List *l)
+int regx::ismatch(List *l)
 {
 	int i;
 
@@ -324,12 +339,11 @@ ismatch(List *l)
 }
 
 /* Add s to l, following unlabeled arrows. */
-void
-addstate(List *l, State *s)
+void regx::addstate(List *l, State *s)
 {
-	if(s == NULL || s->lastlist == listid)
+	if(s == NULL || s->lastlist == this->listid)
 		return;
-	s->lastlist = listid;
+	s->lastlist = this->listid;
 	if(s->c == Split){
 		/* follow unlabeled arrows */
 		addstate(l, s->out);
@@ -339,13 +353,12 @@ addstate(List *l, State *s)
 	l->s[l->n++] = s;
 }
 
-void
-step(List *clist, int c, List *nlist)
+void regx::step(List *clist, int c, List *nlist)
 {
 	int i;
 	State *s;
 
-	listid++;
+	this->listid++;
 	nlist->n = 0;
 	for(i=0; i<clist->n; i++){
 		s = clist->s[i];
@@ -355,8 +368,7 @@ step(List *clist, int c, List *nlist)
 }
 
 /* Run NFA to determine whether it matches s. */
-int
-match(State *start, char *s)
+int regx::match(State *start, char *s)
 {
 	int i, c;
 	List *clist, *nlist, *t;
@@ -372,21 +384,15 @@ match(State *start, char *s)
 	return ismatch(clist);
 }
 
-int
-main(int argc, char **argv)
+bool regx::eval(char *regex,char *string2match)
 {
 	int i;
 	char *post;
 	State *start;
 
-	if(argc < 3){
-		fprintf(stderr, "usage: nfa regexp string...\n");
-		return 1;
-	}
-	
-	post = re2post(argv[1]);
+	post = re2post(regex);
 	if(post == NULL){
-		fprintf(stderr, "bad regexp %s\n", argv[1]);
+		fprintf(stderr, "bad regexp %s\n", regex);
 		return 1;
 	}
 
@@ -399,8 +405,17 @@ main(int argc, char **argv)
     l1.s = (State**) malloc(nstate*sizeof l1.s[0]);
 	l2.s = (State**) malloc(nstate*sizeof l2.s[0]);
     
-	for(i=2; i<argc; i++)
-		if(match(start, argv[i]))
-			printf("%s\n", argv[i]);
+    if(match(start, string2match))
+        return true;
+    else
+        return false;
+    
+}
+
+int main(int argc, char **argv)
+{
+	regx re;
+    bool x = re.eval(argv[1],argv[2]);
+    cout<<x<<"\n";
 	return 0;
 }
