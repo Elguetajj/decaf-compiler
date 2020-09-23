@@ -109,8 +109,8 @@ re2post(char *re)
  */
 enum
 {
-	Match = 256,
-	Split = 257
+	Match = 257,
+	Split = 256
 };
 typedef struct State State;
 struct State
