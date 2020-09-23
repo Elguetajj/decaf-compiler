@@ -372,12 +372,6 @@ match(State *start, char *s)
 	return ismatch(clist);
 }
 
-
-
-
-
-
-
 int
 main(int argc, char **argv)
 {
