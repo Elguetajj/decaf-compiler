@@ -7,11 +7,11 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  char x[] = "ABC";
-  char y[] = "ABBCxyzABB";
-  char re[] = "a(bb)+a";
+  // char x[] = "ABC";
+  // char y[] = "ABBCxyzABB";
+
   Regex reng;
-  char* post = reng.re2post(re);
+  char* post = reng.re2post(argv[1]);
   cout<<post<<'\n';
 
   // Automata auttt;
