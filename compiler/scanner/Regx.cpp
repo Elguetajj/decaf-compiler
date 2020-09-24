@@ -384,7 +384,6 @@ bool Regx::eval(char *regex,char *string2match)
 		fprintf(stderr, "bad regexp %s\n", regex);
 		return 1;
 	}
-	// cout<<post<<"\n";
 
 	start = post2nfa(post);
 	if(start == NULL){
