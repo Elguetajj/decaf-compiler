@@ -37,7 +37,7 @@ void Scanner::tokenize(char filename[])
     char *lex = &lexeme[0];
     std::string tokenValue = "";
     int line=0;
-    int position=0;
+    int position=1;
 
     int errline=0;
     int errposition=0;
@@ -50,11 +50,11 @@ void Scanner::tokenize(char filename[])
 
 
     for(p=str; *p; p++){
-        cout<<"p:"<<p<<"\n";
-        cout<<"current letter: "<<*p<<"\n";
+        // cout<<"p:"<<p<<"\n";
+        // cout<<"current letter: "<<*p<<"\n";
         lexeme += *p;
         charac = *p;
-        cout<<"lexeme:"<<"\n"<<lexeme<<"\n";
+        // cout<<"lexeme:"<<"\n"<<lexeme<<"\n";
        
         if (charac == "\n")
         {
@@ -65,11 +65,12 @@ void Scanner::tokenize(char filename[])
         if (re.eval(reg0,lex))
         {
             if(errlex.size()>0){
-                errlex = "";
                 errorstream = Error(errlex,errposition,errline);
                 errorstream.printErrors();
+                errlex = "";
+
             }
-            cout<<"possible token T_H found:"<<lexeme<<"\n";
+            // cout<<"possible token T_H found:"<<lexeme<<"\n";
             if (lexeme.size()>tokenValue.size())
             {
                 tokenValue = lexeme;
@@ -78,12 +79,11 @@ void Scanner::tokenize(char filename[])
         else if(re.eval(reg,lex))
         {
             if(errlex.size()>0){
-                errlex = "";
                 errorstream = Error(errlex,errposition,errline);
                 errorstream.printErrors();
-
+                errlex = "";
             }
-            cout<<"possible token T_HO found:"<<lexeme<<"\n";
+            // cout<<"possible token T_HO found:"<<lexeme<<"\n";
             if (lexeme.size()>tokenValue.size())
             {
                 tokenValue = lexeme;
@@ -92,11 +92,12 @@ void Scanner::tokenize(char filename[])
         else if (re.eval(reg2,lex))
         {
             if(errlex.size()>0){
-                errlex = "";
                 errorstream = Error(errlex,errposition,errline);
                 errorstream.printErrors();
+                errlex = "";
+
             }
-            cout<<"possible token T_HOL found:"<<lexeme<<"\n";
+            // cout<<"possible token T_HOL found:"<<lexeme<<"\n";
              if (lexeme.size()>tokenValue.size())
             {
                 tokenValue = lexeme;
@@ -106,7 +107,6 @@ void Scanner::tokenize(char filename[])
         {
             if(tokenValue.size()>0)
             {
-                cout<<"token found:"<<tokenValue<<"\n";
                 tokenstream = Token(tokenValue,tokenValue,position-tokenValue.size(),line);
                 tokenstream.printTokens();
                 tokenValue = "";
@@ -119,7 +119,6 @@ void Scanner::tokenize(char filename[])
                 if (strlen(p)==1)
                 {
                     errlex += lexeme;
-                    cout<<"lexeme:"<<errlex<<" could not be tokenized"<<"\n";
                     errorstream = Error(errlex,errposition,errline);
                     errorstream.printErrors();
                 }
@@ -135,7 +134,5 @@ void Scanner::tokenize(char filename[])
         position++;
 
     }
-
-    tokenstream.printTokens();
 }
 
