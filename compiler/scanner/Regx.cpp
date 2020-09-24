@@ -72,8 +72,6 @@ void patch(Ptrlist *l, State *s)
 	}
 }
 
-
-
 class Fragment
 {
 private:
@@ -91,33 +89,12 @@ Fragment::Fragment(State *start, Ptrlist *out)
     this->out = out;
 }
 
-
-// typedef struct Frag Frag;
-
-// struct Fragment
-// {
-// 	State *start;
-// 	Ptrlist *out;
-// };
-
-// /* Initialize Frag struct. */
-// Fragment
-// Frag(State *start, Ptrlist *out)
-// {
-// 	Frag n = { start, out };
-// 	return n;
-// }
-
-
 enum MatchSplit
 {
 	Match = 257,
 	Split = 256
 };
-// State matchstate =  State(Match);
-// int nstate;
-// List l1, l2;
-// static int listid;
+
 
 class List
 {
@@ -330,15 +307,6 @@ State* Regx::post2nfa(char postfix[])
 	return e.start;
 }
 
-// typedef struct List List;
-// struct List
-// {
-// 	State **s;
-// 	int n;
-// };
-
-
-
 /* Compute initial state list */
 List* Regx::startlist(State *start, List *l)
 {
@@ -434,10 +402,10 @@ bool Regx::eval(char *regex,char *string2match)
     
 }
 
-int main(int argc, char **argv)
-{
-	Regx re;
-    bool x = re.eval(argv[1],argv[2]);
-    cout<<x<<"\n";
-	return 0;
-}
+// int main(int argc, char **argv)
+// {
+// 	Regx re;
+//     bool x = re.eval(argv[1],argv[2]);
+//     cout<<x<<"\n";
+// 	return 0;
+// }
