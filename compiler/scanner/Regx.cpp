@@ -128,7 +128,7 @@ public:
 	int n;
 };
 
-class regx
+class Regx
 {
 private:
     State matchstate=  State(Match);;
@@ -148,13 +148,13 @@ public:
 
 };
 
-State* regx::newState(int c, State *out, State *out1){
+State* Regx::newState(int c, State *out, State *out1){
     State* s = new State(c,out,out1);
     nstate++;
     return s;
 }
 
-char* regx::re2post(char *re){
+char* Regx::re2post(char *re){
 	int nalt, natom;
 	static char buf[8000];
 	char *dst;
@@ -170,6 +170,7 @@ char* regx::re2post(char *re){
 	if(strlen(re) >= sizeof buf/2)
 		return NULL;
 	for(; *re; re++){
+		// cout<<"re:"<<*re<<"\n";
 		switch(*re){
 		case '(':
 			if(natom > 1){
@@ -212,6 +213,18 @@ char* regx::re2post(char *re){
 				return NULL;
 			*dst++ = *re;
 			break;
+		case '/':
+			if(natom > 1){
+				--natom;
+				*dst++ = '.';
+			}
+			*dst++ = *re;
+			re++;
+			*dst++ = *re;
+			natom++;
+
+			break;
+		
 		default:
 			if(natom > 1){
 				--natom;
@@ -221,6 +234,7 @@ char* regx::re2post(char *re){
 			natom++;
 			break;
 		}
+		// cout<<"buff:"<<buf<<"\n";
 	}
 	if(p != paren)
 		return NULL;
@@ -234,7 +248,7 @@ char* regx::re2post(char *re){
 
 
 
-State* regx::post2nfa(char postfix[])
+State* Regx::post2nfa(char postfix[])
 {
 	char *p;
 	Fragment e1, e2, e;
@@ -293,6 +307,13 @@ State* regx::post2nfa(char postfix[])
 			my_stack.push(Fragment(s, list1(&s->out1)));
             // cout<<"case +"<<"\n";
 			break;
+		case '/':
+			// cout<<"p:"<<*p<<'\n';
+			p++;
+			// cout<<"pafter:"<<*p<<'\n';
+			s = newState(*p, NULL, NULL);
+			my_stack.push(Fragment(s, list1(&s->out)));
+			break;
 		}
 	}
     // cout<<"out of switch"<<"\n";;
@@ -319,7 +340,7 @@ State* regx::post2nfa(char postfix[])
 
 
 /* Compute initial state list */
-List* regx::startlist(State *start, List *l)
+List* Regx::startlist(State *start, List *l)
 {
 	l->n = 0;
 	this->listid++;
@@ -328,7 +349,7 @@ List* regx::startlist(State *start, List *l)
 }
 
 /* Check whether state list contains a match. */
-int regx::ismatch(List *l)
+int Regx::ismatch(List *l)
 {
 	int i;
 
@@ -339,7 +360,7 @@ int regx::ismatch(List *l)
 }
 
 /* Add s to l, following unlabeled arrows. */
-void regx::addstate(List *l, State *s)
+void Regx::addstate(List *l, State *s)
 {
 	if(s == NULL || s->lastlist == this->listid)
 		return;
@@ -353,7 +374,7 @@ void regx::addstate(List *l, State *s)
 	l->s[l->n++] = s;
 }
 
-void regx::step(List *clist, int c, List *nlist)
+void Regx::step(List *clist, int c, List *nlist)
 {
 	int i;
 	State *s;
@@ -368,7 +389,7 @@ void regx::step(List *clist, int c, List *nlist)
 }
 
 /* Run NFA to determine whether it matches s. */
-int regx::match(State *start, char *s)
+int Regx::match(State *start, char *s)
 {
 	int i, c;
 	List *clist, *nlist, *t;
@@ -384,7 +405,7 @@ int regx::match(State *start, char *s)
 	return ismatch(clist);
 }
 
-bool regx::eval(char *regex,char *string2match)
+bool Regx::eval(char *regex,char *string2match)
 {
 	int i;
 	char *post;
@@ -395,6 +416,7 @@ bool regx::eval(char *regex,char *string2match)
 		fprintf(stderr, "bad regexp %s\n", regex);
 		return 1;
 	}
+	// cout<<post<<"\n";
 
 	start = post2nfa(post);
 	if(start == NULL){
@@ -414,7 +436,7 @@ bool regx::eval(char *regex,char *string2match)
 
 int main(int argc, char **argv)
 {
-	regx re;
+	Regx re;
     bool x = re.eval(argv[1],argv[2]);
     cout<<x<<"\n";
 	return 0;
