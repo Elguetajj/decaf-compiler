@@ -11,9 +11,9 @@ private:
     std::string value;
     int position;
     int line;
-    Error* next;
 
 public:
+    Error* next;
     Error(std::string value, int position, int line);
     Error() = default;
     void setNext(std::string value, int position, int line);

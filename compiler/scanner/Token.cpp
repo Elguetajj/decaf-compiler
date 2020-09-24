@@ -12,9 +12,10 @@ private:
     std::string value;
     int position;
     int line;
-    Token* next;
+    
 
 public:
+    Token* next;
     Token(std::string token_type, std::string value, int position, int line);
     Token() = default;
     void setNext(std::string token_type, std::string value, int position, int line);
