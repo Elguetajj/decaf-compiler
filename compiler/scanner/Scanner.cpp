@@ -8,7 +8,7 @@
 
 std::map<string, string> basics =
 {
-    {"letter" , "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|_)"},
+    {"letter" , "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|_|:|/)|/()"},
     {"digit", "(0|1|2|3|4|5|6|7|8|9)"},
     {"hex_digit" , "(0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|a|b|c|d|e|f)"}
 };
@@ -50,7 +50,7 @@ std::map<string, string> tokens =
     {"T_LCB"           , "{"},
     {"T_LEFTSHIFT"     , "<<"},
     {"T_LEQ"           , "<="},
-    {"T_LPAREN"        , "///("},
+    {"T_LPAREN"        , "/("},
     {"T_LSB"           , "["},
     {"T_LT"            , "<"},
     {"T_MINUS"         , "-"},
@@ -65,12 +65,12 @@ std::map<string, string> tokens =
     {"T_RCB"           , "}"},
     {"T_RETURN"        , "return"},
     {"T_RIGHTSHIFT"    , ">>"},
-    {"T_RPAREN"        , "///)"},
+    {"T_RPAREN"        , "/)"},
     {"T_RSB"           , "]"},
     {"T_SEMICOLON"     , ";"},
     {"T_QUOTE"         , "\"|\'"},
-    {"T_LEFTSTRING", "\""+literals["string_lit"]+"*"},
-    {"T_STRINGCONSTANT", "\""+literals["string_lit"]+"*\""},
+    {"T_LEFTSTRING", "\"("+literals["string_lit"]+"| )*"},
+    {"T_STRINGCONSTANT", "\"("+literals["string_lit"]+"| )*\""},
     {"T_STRINGTYPE"    , "string"},
     {"T_TRUE"          , "true"},
     {"T_VAR"           , "var"},
@@ -85,14 +85,14 @@ private:
     Regx re;
 
 public:
-    void tokenize(char filename[]);
+    TokenStream tokenize(char filename[],bool debug);
     TokenStream tokenstream;
     ErrorStream errorstream;
 };
 
 
 
-void Scanner::tokenize(char filename[])
+TokenStream Scanner::tokenize(char filename[], bool debug)
 {
     std::string mytext;
     fstream MyReadFile(filename);
@@ -110,7 +110,7 @@ void Scanner::tokenize(char filename[])
     std::string errlex = "";
     std::string tokenValue = "";
     std::string type;
-    int line=0;
+    int line=1;
     int position=1;
 
     int errline=0;
@@ -120,6 +120,7 @@ void Scanner::tokenize(char filename[])
     for(p=str; *p; p++){
         lexeme += *p;
         charac = *p;
+
         // cout<<lexeme<<"\n";
         if (re.eval(tokens["T_AND"],lexeme))
         {
@@ -940,9 +941,13 @@ void Scanner::tokenize(char filename[])
         }
         else if (re.eval(tokens["T_WHITESPACE"],lexeme))
         {
-            type = "T_WHITESPACE"; 
             // cout<<"possible"+ type+":" <<lexeme<<"\n";
-            if(errlex.size()>0){
+            if(charac == "\n"){
+                line++;
+                position = 0;
+            }
+            if(errlex.size()>0)
+            {
                 errorstream.addError(new Error(errlex,errposition,errline));
                 errlex = "";
             }
@@ -986,8 +991,9 @@ void Scanner::tokenize(char filename[])
         }
         position++;
     }
-    if(tokenstream.head!=NULL)
-    { cout<<"Token Stream:"<<"\n";
+    if(tokenstream.head!=NULL && debug)
+    { 
+        cout<<"Token Stream:"<<"\n";
         tokenstream.printTokenStream();
     }
     if(errorstream.head!=NULL)
@@ -995,5 +1001,6 @@ void Scanner::tokenize(char filename[])
         cout<<"\n"<<"Error Stream:"<<"\n";
         errorstream.printErrorStream();
     }
+    return this->tokenstream;
 }
 
