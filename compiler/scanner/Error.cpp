@@ -8,11 +8,12 @@ using namespace std;
 class Error
 {
 private:
+    
+public:
     std::string value;
     int position;
     int line;
 
-public:
     Error* next;
     Error(std::string value, int position, int line);
     Error() = default;

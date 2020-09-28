@@ -36,9 +36,9 @@ void ErrorStream::addError(Error* error)
 void ErrorStream::printErrorStream()
 {
     Error* current = this->head;
-    while(current->next != NULL)
+    while(current != tail->next)
     {
-        current->printErrors();
+        cout<<"<<"<<"Error message:"<<": lexeme '"<<current->value<<"' could not be tokenized,"<<"line:"<<current->line<<", position:"<<current->position<<">>"<<"\n";
         current = current->next;
     }
 }

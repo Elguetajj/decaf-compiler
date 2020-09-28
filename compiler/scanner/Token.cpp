@@ -8,13 +8,15 @@ using namespace std;
 class Token
 {
 private:
+   
+    
+
+public:
     std::string token_type;
     std::string value;
     int position;
     int line;
-    
 
-public:
     Token* next;
     Token(std::string token_type, std::string value, int position, int line);
     Token() = default;
@@ -38,7 +40,6 @@ void Token::setNext(std::string token_type, std::string value, int position, int
 
 void Token::printTokens()
 {
-    cout<<"<<"<<this->token_type<<":"<<this->value<<", line:"<<this->line<<", position:"<<this->position<<">>"<<"\n";
 }
 
 

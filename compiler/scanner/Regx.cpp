@@ -120,7 +120,7 @@ public:
     List* startlist(State *start, List *l);
     int ismatch(List *l);
     int match(State *start, char *s);
-    bool eval(char *regex,char *string2match);
+    bool eval(string reg,string str2match);
     State* newState(int c, State *out, State *out1);
 
 };
@@ -373,11 +373,13 @@ int Regx::match(State *start, char *s)
 	return ismatch(clist);
 }
 
-bool Regx::eval(char *regex,char *string2match)
+bool Regx::eval(string reg,string str2match)
 {
 	int i;
 	char *post;
 	State *start;
+	char * regex = &reg[0];
+	char* string2match = &str2match[0];
 
 	post = re2post(regex);
 	if(post == NULL){
@@ -400,11 +402,3 @@ bool Regx::eval(char *regex,char *string2match)
         return false;
     
 }
-
-// int main(int argc, char **argv)
-// {
-// 	Regx re;
-//     bool x = re.eval(argv[1],argv[2]);
-//     cout<<x<<"\n";
-// 	return 0;
-// }

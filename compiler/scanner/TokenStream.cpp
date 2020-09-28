@@ -22,7 +22,7 @@ TokenStream::TokenStream()
 
 void TokenStream::addToken(Token* token)
 {
-    if(this->head == NULL)
+    if(!this->head)
     {
         this->head = token;
         this->tail = token;
@@ -36,9 +36,9 @@ void TokenStream::addToken(Token* token)
 void TokenStream::printTokenStream()
 {
     Token* current = this->head;
-    while(current->next != NULL)
+    while(current!=tail->next)
     {
-        current->printTokens();
+        cout<<"<<"<<current->token_type<<":"<<current->value<<", line:"<<current->line<<", position:"<<current->position<<">>"<<"\n";
         current = current->next;
     }
 }
