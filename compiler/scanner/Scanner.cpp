@@ -25,6 +25,7 @@ std::map<string, string> literals =
 std::map<string, string> tokens =
 {
     {"T_AND"           , "&&"},//
+    {"T_CLASS"         ,"class"},
     {"T_ASSIGN"        , "="},//
     {"T_BOOLTYPE"      , "bool"},//
     {"T_BREAK"         , "break"},//
@@ -125,6 +126,22 @@ TokenStream Scanner::tokenize(char filename[], bool debug)
         if (re.eval(tokens["T_AND"],lexeme))
         {
             type = "T_AND"; 
+            // cout<<"possible"+ type+":" <<lexeme<<"\n";
+            if(errlex.size()>0){
+                errorstream.addError(new Error(errlex,errposition,errline));
+                errlex = "";
+            }
+             if (lexeme.size()>tokenValue.size())
+            {
+                tokenValue = lexeme;
+                if (strlen(p)==1){
+                    tokenstream.addToken(new Token(type,tokenValue,position-tokenValue.size(),line));
+                }
+            } 
+        }
+        else if (re.eval(tokens["T_CLASS"],lexeme))
+        {
+            type = "T_CLASS"; 
             // cout<<"possible"+ type+":" <<lexeme<<"\n";
             if(errlex.size()>0){
                 errorstream.addError(new Error(errlex,errposition,errline));
@@ -1003,4 +1020,3 @@ TokenStream Scanner::tokenize(char filename[], bool debug)
     }
     return this->tokenstream;
 }
-

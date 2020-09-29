@@ -34,6 +34,8 @@ class Program{
             callout("printf", "ERROR: else branch is bad (2)");
         }
 
+        ?
+
         callout("printf", "control flow OK if no previous output");
     }
 
