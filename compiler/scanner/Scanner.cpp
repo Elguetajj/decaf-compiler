@@ -25,12 +25,12 @@ std::map<string, string> literals =
 std::map<string, string> tokens =
 {
     {"T_AND"           , "&&"},//
-    {"T_CLASS"         ,"class"},
+    {"T_CLASS"         , "class"},
     {"T_ASSIGN"        , "="},//
     {"T_BOOLTYPE"      , "bool"},//
     {"T_BREAK"         , "break"},//
-    {"T_LEFTCHAR", "\'("+literals["char_lit"]+")"},
-    {"T_CHARCONSTANT", "\'("+literals["char_lit"]+")\'"},
+    {"T_LEFTCHAR"      , "\'("+literals["char_lit"]+")"},
+    {"T_CHARCONSTANT"  , "\'("+literals["char_lit"]+")\'"},
     {"T_COMMA"         , ","},
     {"T_COMMENT"       , "comment"},
     {"T_CONTINUE"      , "continue"},
@@ -70,14 +70,14 @@ std::map<string, string> tokens =
     {"T_RSB"           , "]"},
     {"T_SEMICOLON"     , ";"},
     {"T_QUOTE"         , "\"|\'"},
-    {"T_LEFTSTRING", "\"("+literals["string_lit"]+"| )*"},
+    {"T_LEFTSTRING"    , "\"("+literals["string_lit"]+"| )*"},
     {"T_STRINGCONSTANT", "\"("+literals["string_lit"]+"| )*\""},
     {"T_STRINGTYPE"    , "string"},
     {"T_TRUE"          , "true"},
     {"T_VAR"           , "var"},
-    {"T_VOID","void"},
-    {"T_WHILE", "while"},
-    {"T_WHITESPACE","(\n|\r|\t|\v|\f| )+"}
+    {"T_VOID"          ,"void"},
+    {"T_WHILE"         , "while"},
+    {"T_WHITESPACE"    ,"(\n|\r|\t|\v|\f| )+"}
 };
 
 class Scanner
@@ -90,8 +90,6 @@ public:
     TokenStream tokenstream;
     ErrorStream errorstream;
 };
-
-
 
 TokenStream Scanner::tokenize(char filename[], bool debug)
 {

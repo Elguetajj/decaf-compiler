@@ -121,7 +121,9 @@ public:
     int ismatch(List *l);
     int match(State *start, char *s);
     bool eval(string reg,string str2match);
+	bool eval(State *start, string str2match);
     State* newState(int c, State *out, State *out1);
+	State* compile(string str2compile);
 
 };
 
@@ -402,3 +404,46 @@ bool Regx::eval(string reg,string str2match)
         return false;
     
 }
+
+bool Regx::eval(State *start,string str2match)
+{
+	char* string2match = &str2match[0];
+
+    l1.s = (State**) malloc(nstate*sizeof l1.s[0]);
+	l2.s = (State**) malloc(nstate*sizeof l2.s[0]);
+    
+    if(match(start, string2match))
+        return true;
+    else
+        return false;  
+}
+
+
+State *Regx::compile(string reg)
+{
+	int i;
+	char *post;
+	State *start;
+	char * regex = &reg[0];
+
+	post = re2post(regex);
+	if(post == NULL){
+		fprintf(stderr, "bad regexp %s\n", regex);
+		return NULL;
+	}
+
+	start = post2nfa(post);
+	if(start == NULL){
+		fprintf(stderr, "error in post2nfa %s\n", post);
+		return NULL;
+	}
+	
+	return start;
+}
+
+
+
+
+
+
+
