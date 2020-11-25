@@ -14,6 +14,7 @@ int main(int argc, char **argv)
 	bool debug = 0;
 
 
+
     for (i = 1; i < argc; i++)
 	{
 
@@ -43,6 +44,9 @@ int main(int argc, char **argv)
 	if(target=="scan"){
 		scan.tokenize(argv[argc-1],debug);
 	}
+	// State* hola = rreg.compile("(a|b)*");
+	// string a = "aabbc";
+	// cout<<rreg.eval(hola,a)<<"\n";
 
 	return 0;
 }
